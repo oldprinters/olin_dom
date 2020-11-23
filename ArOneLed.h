@@ -19,6 +19,7 @@ class ArOneLed
 public:
 	ArOneLed( const int* arp, const int n);
 	void init();
+	void delArray();
 	void setDims(int* arMode);
 	void setON();
 	void setOFF();

@@ -4,11 +4,11 @@
 
 //****************************************************
 ArOneLed::ArOneLed(const int* arp, const int n):arP(arp), nPins(n) {
+	ar = new OneLed * [nPins];
 	init();
 }
 //****************************************************
 void ArOneLed::init() {
-	ar = new OneLed * [nPins];
 	for (int i = 0; i < nPins; ++i) {
 		ar[i] = new OneLed(arP[i]);
 	}
@@ -39,8 +39,13 @@ void ArOneLed::setBlink() {
 }
 //****************************************************
 void ArOneLed::setStatic() {
-	delete[] ar;
+	delArray();
 	init();
+}
+//****************************************************
+void ArOneLed::delArray() {
+	for (int i{}; i < nPins; ++i)
+		delete ar[i];
 }
 //****************************************************
 void ArOneLed::setRandom() {

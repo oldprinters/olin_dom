@@ -2,7 +2,7 @@
 #include "ArOneLed.h"
 #include "OneLed.h"
 
-#define T_IBLINK 150
+#define T_IBLINK 100
 
 const int MAX_LED{ 8 };
 const int LED3{ 3 };
@@ -25,16 +25,15 @@ int nPosArray{};		//номер позиции в массиве
 int nIBlink{};
 
 int arModeManual[][MAX_LED]{
-	{0, 0, 0, 0, 0, 0, 0, 0},
-	{1, 0, 0, 0, 0, 0, 0, 0},
-	{0, 1, 0, 0, 0, 0, 0, 0},
-	{0, 0, 1, 0, 0, 0, 0, 0},
-	{0, 0, 0, 1, 0, 0, 0, 0},
-	{0, 0, 0, 0, 1, 0, 0, 0},
-	{0, 0, 0, 0, 0, 1, 0, 0},
-	{0, 0, 0, 0, 0, 0, 1, 0},
-	{0, 0, 0, 0, 0, 0, 0, 1},
-	{0, 1, 1, 1, 1, 1, 1, 1},
+	{255, 0, 0, 0, 0, 0, 0, 0},
+	{0, 255, 0, 0, 0, 0, 0, 0},
+	{0, 0, 255, 0, 0, 0, 0, 0},
+	{0, 0, 0, 255, 0, 0, 0, 0},
+	{0, 0, 0, 0, 255, 0, 0, 0},
+	{0, 0, 0, 0, 0, 255, 0, 0},
+	{0, 0, 0, 0, 0, 0, 255, 0},
+	{0, 0, 0, 0, 0, 0, 0, 255},
+	{255, 255, 255, 255, 255, 255, 255, 255},
 };
 
 Timer timerIr(10000);
@@ -59,14 +58,18 @@ void iBlink(int nBlink) {
 		}
 		delay(T_IBLINK);
 	}
+	for (int j = 0; j < MAX_LED; ++j) {
+		digitalWrite(arPins[j], LOW);
+	}
 }
 //******************************************
 void setup() {
-	Serial.begin(9600);
+//	Serial.begin(9600);
 	sizeAr = sizeof(arModeManual) / sizeof(arModeManual[0]);	//число ручных режимов
 	pinMode(IR, INPUT);
 	pinMode(BUTTON, INPUT);
 	iBlink(1);
+	arOneLed.setRandom();
 	attachInterrupt(digitalPinToInterrupt(2), press_button, LOW);
 }
 //***************************************************************
@@ -83,10 +86,11 @@ void loop() {
 			stateHome = StateHome::MANUAL; 
 			nPosArray = 0; 
 			arOneLed.setStatic();
-			iBlink(5);
+			arOneLed.setDims(arModeManual[nPosArray]);
+			iBlink(1);
 			break;
 		case StateHome::MANUAL:
-			if (++nPosArray == sizeAr) {
+			if (nPosArray == sizeAr-1) {
 				nPosArray = 0;
 				stateHome = StateHome::IR;
 				arOneLed.setRandom();
@@ -95,16 +99,17 @@ void loop() {
 				iBlink(1);
 			}
 			else {
-				arOneLed.setDims(arModeManual[nPosArray]);
+				arOneLed.setDims(arModeManual[nPosArray++]);
 			}
 			break;
 		case StateHome::IR:
 			stateHome = StateHome::OFF; 
-			arOneLed.setOFF();
+			arOneLed.setStatic();
 			iBlink(2);
+			arOneLed.setOFF();
 			break;
 		}
-		Serial.println(static_cast<int>(stateHome));
+//		Serial.println(static_cast<int>(stateHome));
 	}
 	
 	if (stateHome == StateHome::IR) {
