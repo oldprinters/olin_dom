@@ -18,6 +18,7 @@ void ArOneLed::setDims(int* arDims) {
 	for (int i{}; i < nPins; ++i) {
 		ar[i]->setDim(arDims[i]);
 	}
+	Serial.println("-----------------------------");
 }
 //****************************************************
 void ArOneLed::setON() {

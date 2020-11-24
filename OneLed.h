@@ -19,7 +19,7 @@ class OneLed:	public Timer
 	int levelDim{ 0 };
 	StatLed statLed{ StatLed::OFF };
 public:
-	OneLed(int p): Timer(10), pin(p) { pinMode(pin, OUTPUT); }
+	OneLed(int p): Timer(8), pin(p) { pinMode(pin, OUTPUT); }
 	int getPin() { return pin; }
 	void setStat(StatLed stat);
 	void setDim(int l);

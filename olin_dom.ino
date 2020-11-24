@@ -2,21 +2,31 @@
 #include "ArOneLed.h"
 #include "OneLed.h"
 
+/*
+ЖЕЛТЫЙ фиолетовый - кнопка	D2
+ораанжевый кор. - над кнопкой - 4 D4
+оранжевый зеленый 1 эт. хол D3
+красный фиолетовый 1 этаж 2 D5
+оранжевый синий 2 этаж мал. комн. D6
+желтый коричневый 2 этаж болш. комн. 1 D7
+желтый синий 2 этаж бол. комн. 2 D9
+черный зеленый и черный фиолетовый крыльцо D10, D11
+IR D12
+*/
 #define T_IBLINK 100
+#define LED_BLINK 4
 
-const int MAX_LED{ 8 };
-const int LED3{ 3 };
-const int LED4{ 4 };
+const int MAX_LED{ 7 };
 const int BUTTON{ 2 };
 const int IR{ 12 };
 
 volatile bool flag;
 bool stsLedTest{ 0 };
 enum class StateHome { OFF, AUTO, MANUAL, IR, COUNT };
-StateHome stateHome = StateHome::AUTO;
+StateHome stateHome{ StateHome::AUTO };
 bool irStat{};	// состояние в режиме IR
 
-const int arPins[MAX_LED]{ 3, 4, 5, 6, 7, 8, 9, 10 };
+const int arPins[MAX_LED]{ 3, 5, 6, 7, 9, 10, 11 };
 ArOneLed arOneLed(static_cast<const int*>(arPins), MAX_LED);
 
 int sizeAr{};			//размер массива ручных режимов
@@ -25,15 +35,14 @@ int nPosArray{};		//номер позиции в массиве
 int nIBlink{};
 
 int arModeManual[][MAX_LED]{
-	{255, 0, 0, 0, 0, 0, 0, 0},
-	{0, 255, 0, 0, 0, 0, 0, 0},
-	{0, 0, 255, 0, 0, 0, 0, 0},
-	{0, 0, 0, 255, 0, 0, 0, 0},
-	{0, 0, 0, 0, 255, 0, 0, 0},
-	{0, 0, 0, 0, 0, 255, 0, 0},
-	{0, 0, 0, 0, 0, 0, 255, 0},
-	{0, 0, 0, 0, 0, 0, 0, 255},
-	{255, 255, 255, 255, 255, 255, 255, 255},
+	{255, 255, 255, 255, 255, 255, 255},
+	{0, 0, 0, 0, 0, 255, 255},
+	{255, 255, 0, 0, 0, 100, 100},
+	{255, 0, 255, 0, 0, 0, 0},
+	{0, 0, 0, 255, 255, 50, 50},
+	{0, 0, 255, 0, 255, 0, 0},
+	{0, 0, 80, 0, 80, 50, 50},
+	{0, 0, 255, 255, 0, 100, 100},
 };
 
 Timer timerIr(10000);
@@ -49,18 +58,10 @@ void press_button()
 void iBlink(int nBlink) {
 	nBlink *= 2;
 	for (; nBlink--;) {
-		for (int j = 0; j < MAX_LED; ++j) {
-			digitalWrite(arPins[j], nBlink & 1);
-		}
-		delay(T_IBLINK);
-		for (int j = 0; j < MAX_LED; ++j) {
-			digitalWrite(arPins[j], nBlink & 1 ^ 1);
-		}
+		digitalWrite(LED_BLINK, nBlink % 2);
 		delay(T_IBLINK);
 	}
-	for (int j = 0; j < MAX_LED; ++j) {
-		digitalWrite(arPins[j], LOW);
-	}
+	digitalWrite(LED_BLINK, LOW);
 }
 //******************************************
 void setup() {
@@ -68,6 +69,7 @@ void setup() {
 	sizeAr = sizeof(arModeManual) / sizeof(arModeManual[0]);	//число ручных режимов
 	pinMode(IR, INPUT);
 	pinMode(BUTTON, INPUT);
+	pinMode(LED_BLINK, OUTPUT);
 	iBlink(1);
 	arOneLed.setRandom();
 	attachInterrupt(digitalPinToInterrupt(2), press_button, LOW);
@@ -96,10 +98,10 @@ void loop() {
 				arOneLed.setRandom();
 				timerIr.setTimer();
 				irStat = true;
-				iBlink(1);
+				iBlink(3);
 			}
 			else {
-				arOneLed.setDims(arModeManual[nPosArray++]);
+				arOneLed.setDims(arModeManual[++nPosArray]);
 			}
 			break;
 		case StateHome::IR:
@@ -109,14 +111,13 @@ void loop() {
 			arOneLed.setOFF();
 			break;
 		}
-//		Serial.println(static_cast<int>(stateHome));
 	}
 	
 	if (stateHome == StateHome::IR) {
 		if (timerIr.getTimer()) {
 			if (digitalRead(IR)) {
 				if (!irStat) {
-					arOneLed.setRandom();
+//					arOneLed.setRandom();	//??????????????????????????
 					irStat = true;
 				}
 				timerIr.setTimer();

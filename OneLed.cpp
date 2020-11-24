@@ -9,7 +9,7 @@
 //управление димером
 void OneLed::setDim(int l) {
 	levelDim = l; 
-	statLed = StatLed::DIM; 
+//	Serial.println(levelDim);
 }
 //*********************************************
 void OneLed::setStat(StatLed stat) {
@@ -25,11 +25,10 @@ void OneLed::setStat(StatLed stat) {
 void OneLed::cycle() {
 	if (level != levelDim) {
 		if (getTimer()) {
-//			Serial.println(level);
 			setTimer();
-			level += level < levelDim? 1: -1;
-			analogWrite(pin, level);
+			level += (level < levelDim? 1: -1);
 		}
 	}
+	analogWrite(pin, level);
 }
 

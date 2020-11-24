@@ -7,8 +7,8 @@
 void OneRled::cycle()
 {
 	if (rTimer.getTimer()) {
-		setDim(random(255));
-		rTimer.setTimer(random(3000, 15000));
+		setDim(random(155));
+		rTimer.setTimer(random(8000, 15000));
 	}
 	OneLed::cycle();
 }
