@@ -22,8 +22,8 @@ const int IR{ 12 };
 
 volatile bool flag;
 bool stsLedTest{ 0 };
-enum class StateHome { OFF, AUTO, MANUAL, IR, COUNT };
-StateHome stateHome{ StateHome::AUTO };
+enum class StateHome { OFF, IR, MANUAL, AUTO, COUNT };
+StateHome stateHome{ StateHome::IR };
 bool irStat{};	// состояние в режиме IR
 
 const int arPins[MAX_LED]{ 3, 5, 6, 7, 9, 10, 11 };
@@ -45,7 +45,7 @@ int arModeManual[][MAX_LED]{
 	{0, 0, 255, 255, 0, 100, 100},
 };
 
-Timer timerIr(10000);
+Timer timerIr(600000);
 //***********************************
 void press_button()
 {
