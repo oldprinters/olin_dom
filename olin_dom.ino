@@ -45,7 +45,7 @@ int arModeManual[][MAX_LED]{
 	{0, 0, 255, 255, 0, 100, 100},
 };
 
-Timer timerIr(600000);
+Timer timerIr(120000);
 //***********************************
 void press_button()
 {
@@ -116,8 +116,8 @@ void loop() {
 	if (stateHome == StateHome::IR) {
 		if (timerIr.getTimer()) {
 			if (digitalRead(IR)) {
-				if (!irStat) {
-//					arOneLed.setRandom();	//??????????????????????????
+				if (!irStat) {				//находимся в режиме IR
+					arOneLed.setRandom();	//??????????????????????????
 					irStat = true;
 				}
 				timerIr.setTimer();
