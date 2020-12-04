@@ -47,7 +47,7 @@ int arModeManual[][MAX_LED]{
 	{0, 0, 255, 255, 0, 100, 100},
 };
 
-Timer timerIr(120000);
+Timer timerIr(240000);
 //***********************************
 void press_button()
 {
